@@ -1,15 +1,28 @@
 package com.example.aadk_3app1
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 // One Screen per activity
 // With Fragments we can have multiple UI Screens with one Activity
+
+// Second Activity is Welcome Activity
+// I want to go to that screen once the user is logged in
+
+// TODO 1: How to pass a data class object from one activity to the other, using Intents
+// TODO 2: How to pass a normal class object from one activity to the other, using Intents
+// TODO: Parcelable and Serializable
 class MainActivity : AppCompatActivity() {
+
+    // Within the scope of this activity, you can get its reference by using `this` keyword
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -20,6 +33,8 @@ class MainActivity : AppCompatActivity() {
 
         val usernameLayout: TextInputLayout = findViewById(R.id.etUsername)
         val passwordLayout: TextInputLayout = findViewById(R.id.etPassword)
+
+        val tvGotoFAQs: TextView = findViewById(R.id.tvGotoFAQs)
 
         // TODO: Understand how can you clear the error
         btn.setOnClickListener {
@@ -39,7 +54,54 @@ class MainActivity : AppCompatActivity() {
             // If everything is fine, then submit
             if (checkFormDetails(username, password)) {
                 Toast.makeText(this@MainActivity, "Login Successful", Toast.LENGTH_SHORT).show()
+
+                // TODO: Goto the next activity
+                /*
+                * Intents -> One of the use of intents is to navigate to a new Activity
+                * passing data
+                * Start a Service
+                * Open some other app
+                * Broadcasting a message
+                * */
+
+                /*
+                * Intents are of 2 types
+                * 1- Explicit Intents -> Used for internal navigation - from one activity to other (in the same app)
+                * 2- Implicit Intents -> Used for external navigation - from one activity to other app
+                * */
+
+                /* EXPLICIT INTENT
+                * Intent(sender's context, receiver's reference to the java class)
+                * */
+
+                // BUNDLE -> Key Value pair object in Android
+                val intent = Intent(this@MainActivity, WelcomeActivity::class.java)
+//                intent.putExtra(USERNAME_KEY, username)
+//                intent.putExtra(PASSWORD_KEY, password)
+                val bundle = Bundle()
+                bundle.putString(USERNAME_KEY, username)
+                bundle.putString(PASSWORD_KEY, password)
+                intent.putExtras(bundle)
+
+                startActivity(intent)
             }
+        }
+
+        /*
+        * URI -> Uniform Resource Identifier
+        * URL -> Uniform Resource Locator
+        * */
+
+        tvGotoFAQs.setOnClickListener {
+            // IMPLICIT INTENT -> Action
+            // Redirect this to a webpage - (https://www.geeksforgeeks.org) -> convert the url to a URI
+            val url = "https://www.geeksforgeeks.org"
+            val uri = Uri.parse(url)
+            // How we log things / errors
+            Log.d("AADK3CustomTag1", url)
+            Log.d("AADK3CustomTag2", uri.toString())
+            val implicitIntent = Intent(Intent.ACTION_VIEW, uri)
+            startActivity(implicitIntent)
         }
     }
 
