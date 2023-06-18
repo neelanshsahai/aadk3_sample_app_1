@@ -8,8 +8,10 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.aadk_3app1.databinding.ActivityMainBinding
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseAuth
 
 // One Screen per activity
 // With Fragments we can have multiple UI Screens with one Activity
@@ -23,37 +25,57 @@ import com.google.android.material.textfield.TextInputLayout
 class MainActivity : AppCompatActivity() {
 
     // Within the scope of this activity, you can get its reference by using `this` keyword
+
+    private lateinit var myAuth: FirebaseAuth
+    private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val btn: Button = findViewById(R.id.btnLogin)
-        val etUserName: TextInputEditText = findViewById(R.id.tietUsername)
-        val etPassword: TextInputEditText = findViewById(R.id.tietPassword)
-
-        val usernameLayout: TextInputLayout = findViewById(R.id.etUsername)
-        val passwordLayout: TextInputLayout = findViewById(R.id.etPassword)
-
-        val tvGotoFAQs: TextView = findViewById(R.id.tvGotoFAQs)
+        myAuth = FirebaseAuth.getInstance()
 
         // TODO: Understand how can you clear the error
-        btn.setOnClickListener {
-            val username = etUserName.text.toString()
-            val password = etPassword.text.toString()
+        binding.btnLogin.setOnClickListener {
+            val username = binding.tietUsername.text.toString()
+            val password = binding.tietPassword.text.toString()
 
             if (username.isBlank()) {
                 // Show an error "Please enter a valid username"
-                usernameLayout.error = "Please enter a valid username"
+                binding.etUsername.error = "Please enter a valid username"
             }
 
             if (password.isEmpty()) {
                 // Show error
-                passwordLayout.error = "Please enter a password first"
+                binding.etPassword.error = "Please enter a password first"
             }
+
+            // check if user exists
+            // if exists goto next screen
+            // if not create a user with the given mail id and password
+
 
             // If everything is fine, then submit
             if (checkFormDetails(username, password)) {
-                Toast.makeText(this@MainActivity, "Login Successful", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this@MainActivity, "Login Successful", Toast.LENGTH_SHORT).show()
+
+                myAuth.signInWithEmailAndPassword(username, password).addOnCompleteListener { signInTask ->
+                    if (signInTask.isSuccessful) {
+                        Log.d("wiuebf", "Sign In Successful")
+                    } else {
+                        Log.d("keyfefyv", "${signInTask.exception}")
+                        // Add a check
+                        // if (it.exception is of the type FirebaseAuthInvalidUserException) {
+                        // Create a new user
+                        myAuth.createUserWithEmailAndPassword(username, password).addOnCompleteListener { signUpTask ->
+                            if (signUpTask.isSuccessful) {
+                                Log.d("wjhbvi", "SignUp Successful")
+                            } else {
+                                Log.d("iuebfon", "${signUpTask.exception}")
+                            }
+                        }
+                    }
+                }
 
                 // TODO: Goto the next activity
                 /*
@@ -75,15 +97,15 @@ class MainActivity : AppCompatActivity() {
                 * */
 
                 // BUNDLE -> Key Value pair object in Android
-                val intent = Intent(this@MainActivity, WelcomeActivity::class.java)
+//                val intent = Intent(this@MainActivity, WelcomeActivity::class.java)
 //                intent.putExtra(USERNAME_KEY, username)
 //                intent.putExtra(PASSWORD_KEY, password)
-                val bundle = Bundle()
-                bundle.putString(USERNAME_KEY, username)
-                bundle.putString(PASSWORD_KEY, password)
-                intent.putExtras(bundle)
-
-                startActivity(intent)
+//                val bundle = Bundle()
+//                bundle.putString(USERNAME_KEY, username)
+//                bundle.putString(PASSWORD_KEY, password)
+//                intent.putExtras(bundle)
+//
+//                startActivity(intent)
             }
         }
 
@@ -92,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         * URL -> Uniform Resource Locator
         * */
 
-        tvGotoFAQs.setOnClickListener {
+        binding.tvGotoFAQs.setOnClickListener {
             // IMPLICIT INTENT -> Action
             // Redirect this to a webpage - (https://www.geeksforgeeks.org) -> convert the url to a URI
             val url = "https://www.geeksforgeeks.org"

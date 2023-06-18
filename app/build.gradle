@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -36,6 +37,17 @@ android {
 }
 
 dependencies {
+
+    // BOM -> Set of a few dependencies along with the compatible versions
+    // Basic FB deps
+    implementation platform('com.google.firebase:firebase-bom:32.1.1')
+
+    // FB Auth deps
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    // FB Realtime DB deps
+    implementation 'com.google.firebase:firebase-database-ktx'
+    // FB Storage deps
+    implementation 'com.google.firebase:firebase-storage-ktx'
 
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
